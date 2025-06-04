@@ -17,22 +17,16 @@ class PasswordService {
        }
    }
 
-
-   async hashPassword(password: string): Promise<string> {
-       try {
-           const saltRounds = 10;
-           return await bcrypt.hash(password, saltRounds);
-       } catch (error) {
-           console.error(`Hashing Error: ${error.message}`);
-           throw new Error('Failed to hash password');
-       }
+async hashPassword(password: string): Promise<string> {
+       const saltRounds = 10;
+       const hashedPassword = await bcrypt.hash(password, saltRounds);
+       console.log('hash', hashedPassword)
+       return hashedPassword;
    }
-
 
    async createOrUpdate({ userId, password }: { userId: string; password: string }): Promise<void> {
        try {
            const existing = await PasswordModel.findOne({ userId });
-
 
            if (existing) {
                existing.password = password;
@@ -45,6 +39,7 @@ class PasswordService {
            throw new Error('Failed to save password');
        }
    }
+   
 }
 
 

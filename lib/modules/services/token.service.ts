@@ -17,7 +17,7 @@ class TokenService {
            userData,
            config.JwtSecret,
            {
-               expiresIn: '3h'
+               expiresIn: config.tokenExpiration
            });
 
        try {
@@ -53,6 +53,28 @@ class TokenService {
            throw new Error('Error while removing token');
        }
    }
+
+   public async removeExpiredTokens() {
+       try {
+           const expirationTimeMs = config.tokenExpirationMs;
+           const now = Date.now();
+           const result = await TokenModel.deleteMany({
+               createDate: { $lt: now - expirationTimeMs }
+           });
+           if (result.deletedCount > 0) {
+               console.log(`Usunięto ${result.deletedCount} wygasłych tokenów.`);
+           }
+           return result;
+       } catch (error) {
+           console.error('Błąd podczas usuwania wygasłych tokenów:', error);
+           throw new Error('Błąd podczas usuwania wygasłych tokenów');
+       }
+   }
+
+   public async getAllTokens() {
+       return await TokenModel.find({});
+   }
+
 }
 
 export default TokenService;
